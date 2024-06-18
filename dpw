@@ -1,0 +1,41 @@
+#!/bin/sh
+set -e
+
+PACMAN=paru
+PACKAGES_FILE="${HOME}/.config/dpw/packages.ini"
+
+if [ ! -e "${PACKAGES_FILE}" ]; then
+  echo -e "\033[1;32m::\033[0m Packages file '${PACKAGES_FILE}' does not exist."
+  while true; do
+    echo -ne "\033[1;32m::\033[0m Do you wish to generate one using the currently installed packages [Y/n]? "
+    read YN
+    case ${YN:-Y} in
+      [Yy]*)
+        mkdir --parents "${PACKAGES_FILE%/*}"
+        "${PACMAN}" --query --explicit --quiet > "${PACKAGES_FILE}"
+        break;;
+      [Nn]*)
+        exit;;
+    esac
+  done
+fi
+
+OLD_PACKAGES=$(comm -23 <("${PACMAN}" -Qqett | sort) <(sed 's/[[:space:]]//g;s/#.*$//g' "${PACKAGES_FILE}" | sort | uniq) | tr '\n' ' ' | sed 's/^[[:space:]]*//g;s/[[:space:]]*$//g')
+NEW_PACKAGES=$(comm -13 <("${PACMAN}" -Qqe   | sort) <(sed 's/[[:space:]]//g;s/#.*$//g' "${PACKAGES_FILE}" | sort | uniq) | tr '\n' ' ' | sed 's/^[[:space:]]*//g;s/[[:space:]]*$//g')
+
+if [ ! -z "${OLD_PACKAGES}" ]; then
+  echo -e "\033[1;32m::\033[0;1m Removing packages\033[0m ${OLD_PACKAGES}"
+  "${PACMAN}" --remove --cascade --nosave --recursive --unneeded ${OLD_PACKAGES}
+else
+  echo -e "\033[1;32m::\033[0;1m No packages to remove\033[0m"
+fi
+
+if [ ! -z "${NEW_PACKAGES}" ]; then
+  echo -e "\033[1;32m::\033[0;1m Installing packages\033[0m ${NEW_PACKAGES}"
+  "${PACMAN}" --sync ${NEW_PACKAGES}
+else
+  echo -e "\033[1;32m::\033[0;1m No packages to install\033[0m"
+fi
+
+echo -e "\033[1;32m::\033[0;1m Upgrading the system\033[0m"
+"${PACMAN}" --sync --sysupgrade --refresh
