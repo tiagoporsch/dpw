@@ -20,8 +20,8 @@ if [ ! -e "${PACKAGES_FILE}" ]; then
   done
 fi
 
-OLD_PACKAGES=$(comm -23 <("${PACMAN}" -Qqett | sort) <(sed 's/[[:space:]]//g;s/#.*$//g' "${PACKAGES_FILE}" | sort | uniq) | tr '\n' ' ' | sed 's/^[[:space:]]*//g;s/[[:space:]]*$//g')
-NEW_PACKAGES=$(comm -13 <("${PACMAN}" -Qqe   | sort) <(sed 's/[[:space:]]//g;s/#.*$//g' "${PACKAGES_FILE}" | sort | uniq) | tr '\n' ' ' | sed 's/^[[:space:]]*//g;s/[[:space:]]*$//g')
+OLD_PACKAGES=$(comm -23 <("${PACMAN}" -Qqtt | sort) <(sed 's/[[:space:]]//g;s/#.*$//g' "${PACKAGES_FILE}" | sort | uniq) | tr '\n' ' ' | sed 's/^[[:space:]]*//g;s/[[:space:]]*$//g')
+NEW_PACKAGES=$(comm -13 <("${PACMAN}" -Qqe  | sort) <(sed 's/[[:space:]]//g;s/#.*$//g' "${PACKAGES_FILE}" | sort | uniq) | tr '\n' ' ' | sed 's/^[[:space:]]*//g;s/[[:space:]]*$//g')
 
 if [ ! -z "${OLD_PACKAGES}" ]; then
   echo -e "\033[1;32m::\033[0;1m Removing packages\033[0m ${OLD_PACKAGES}"
