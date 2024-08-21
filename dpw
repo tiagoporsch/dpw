@@ -6,7 +6,7 @@ PKG_FILE="${HOME}/.config/dpw/packages.ini"
 
 # Generate packages.ini if it does not exist
 if [ ! -e "${PKG_FILE}" ]; then
-  printf "\033[1m::\033[0m Packages file '%s' does not exist." "${PKG_FILE}\n"
+  printf "\033[1m::\033[0m Packages file '%s' does not exist.\n" "${PKG_FILE}"
   while true; do
     printf "\033[1m::\033[0m Do you wish to generate one using the currently installed packages [Y/n]? "
     read -r YN
@@ -30,13 +30,13 @@ PKG_INSTALLED=$("${PACMAN}" -Q --quiet | sort --unique)
 PKG_INSTALLED_EXPLICIT=$("${PACMAN}" -Q --quiet --explicit | sort --unique)
 PKG_INSTALLED_UNREQUIRED=$("${PACMAN}" -Q --quiet --explicit --unrequired --unrequired | sort --unique)
 
-PKG_EXPLICIT_NOT_DECLARED=$(diff "$PKG_INSTALLED_EXPLICIT" "$PKG_DECLARED")
-PKG_MARK_DEPENDENCY=$(diff "$PKG_EXPLICIT_NOT_DECLARED" "$PKG_INSTALLED_UNREQUIRED")
-PKG_REMOVE=$(diff "$PKG_EXPLICIT_NOT_DECLARED" "$PKG_MARK_DEPENDENCY")
+PKG_EXPLICIT_NOT_DECLARED=$(diff "${PKG_INSTALLED_EXPLICIT}" "${PKG_DECLARED}")
+PKG_MARK_DEPENDENCY=$(diff "${PKG_EXPLICIT_NOT_DECLARED}" "${PKG_INSTALLED_UNREQUIRED}")
+PKG_REMOVE=$(diff "${PKG_EXPLICIT_NOT_DECLARED}" "${PKG_MARK_DEPENDENCY}")
 
-PKG_DECLARED_NOT_EXPLICIT=$(diff "$PKG_DECLARED" "$PKG_INSTALLED_EXPLICIT")
-PKG_INSTALL=$(diff "$PKG_DECLARED_NOT_EXPLICIT" "$PKG_INSTALLED")
-PKG_MARK_EXPLICIT=$(diff "$PKG_DECLARED_NOT_EXPLICIT" "$PKG_INSTALL")
+PKG_DECLARED_NOT_EXPLICIT=$(diff "${PKG_DECLARED}" "${PKG_INSTALLED_EXPLICIT}")
+PKG_INSTALL=$(diff "${PKG_DECLARED_NOT_EXPLICIT}" "${PKG_INSTALLED}")
+PKG_MARK_EXPLICIT=$(diff "${PKG_DECLARED_NOT_EXPLICIT}" "${PKG_INSTALL}")
 
 # Print summary
 if [ -n "${PKG_REMOVE}" ]; then
@@ -54,25 +54,25 @@ fi
 
 # Do actions
 if [ -n "${PKG_REMOVE}" ]; then
-  ${PACMAN} --remove --recursive --unneeded "${PKG_REMOVE}"
+  "${PACMAN}" --remove --recursive --unneeded "${PKG_REMOVE}"
 fi
 if [ -n "${PKG_INSTALL}" ]; then
-  ${PACMAN} --sync "${PKG_INSTALL}"
+  "${PACMAN}" --sync "${PKG_INSTALL}"
 fi
 if [ -n "${PKG_MARK_DEPENDENCY}" ]; then
-  ${PACMAN} --database --asdeps "${PKG_MARK_DEPENDENCY}"
+  "${PACMAN}" --database --asdeps "${PKG_MARK_DEPENDENCY}"
 fi
 if [ -n "${PKG_MARK_EXPLICIT}" ]; then
-  ${PACMAN} --database --asexplicit "${PKG_MARK_EXPLICIT}"
+  "${PACMAN}" --database --asexplicit "${PKG_MARK_EXPLICIT}"
 fi
 
 # Check for newly unused dependencies arising from the database changes
-# NOTE(Tiago): Not sure if this is necessary
-PKG_UNUSED_DEPENDENCY=$("${PACMAN}" -Q --quiet --deps --unrequired --unrequired | sort --unique)
+# NOTE(Tiago): Not sure if this is necessary because of the --recursive call to --remove
+PKG_INSTALLED_UNUSED=$("${PACMAN}" -Q --quiet --deps --unrequired --unrequired | sort --unique)
 
-if [ -n "${PKG_UNUSED_DEPENDENCY}" ]; then
-  printf "\033[1m::\033[1;31m Prune\033[0m %s\n" "$(echo "${PKG_UNUSED_DEPENDENCY}" | tr '\n' ' ')"
-  "${PACMAN}" --remove --recursive "${PKG_UNUSED_DEPENDENCY}"
+if [ -n "${PKG_INSTALLED_UNUSED}" ]; then
+  printf "\033[1m::\033[1;31m Prune\033[0m %s\n" "$(echo "${PKG_INSTALLED_UNUSED}" | tr '\n' ' ')"
+  "${PACMAN}" --remove --recursive "${PKG_INSTALLED_UNUSED}"
 fi
 
 # Do a system upgrade
