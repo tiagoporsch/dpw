@@ -54,16 +54,16 @@ fi
 
 # Do actions
 if [ -n "${PKG_REMOVE}" ]; then
-  "${PACMAN}" --remove --recursive --unneeded "${PKG_REMOVE}"
+  "${PACMAN}" --remove --recursive --unneeded ${PKG_REMOVE}
 fi
 if [ -n "${PKG_INSTALL}" ]; then
-  "${PACMAN}" --sync "${PKG_INSTALL}"
+  "${PACMAN}" --sync ${PKG_INSTALL}
 fi
 if [ -n "${PKG_MARK_DEPENDENCY}" ]; then
-  "${PACMAN}" --database --asdeps "${PKG_MARK_DEPENDENCY}"
+  "${PACMAN}" --database --asdeps ${PKG_MARK_DEPENDENCY}
 fi
 if [ -n "${PKG_MARK_EXPLICIT}" ]; then
-  "${PACMAN}" --database --asexplicit "${PKG_MARK_EXPLICIT}"
+  "${PACMAN}" --database --asexplicit ${PKG_MARK_EXPLICIT}
 fi
 
 # Check for newly unused dependencies arising from the database changes
@@ -72,7 +72,7 @@ PKG_INSTALLED_UNUSED=$("${PACMAN}" -Q --quiet --deps --unrequired --unrequired |
 
 if [ -n "${PKG_INSTALLED_UNUSED}" ]; then
   printf "\033[1m::\033[1;31m Prune\033[0m %s\n" "$(echo "${PKG_INSTALLED_UNUSED}" | tr '\n' ' ')"
-  "${PACMAN}" --remove --recursive "${PKG_INSTALLED_UNUSED}"
+  "${PACMAN}" --remove --recursive ${PKG_INSTALLED_UNUSED}
 fi
 
 # Do a system upgrade
