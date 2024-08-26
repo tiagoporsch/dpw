@@ -67,7 +67,6 @@ if [ -n "${PKG_MARK_EXPLICIT}" ]; then
 fi
 
 # Check for newly unused dependencies arising from the database changes
-# NOTE(Tiago): Not sure if this is necessary because of the --recursive call to --remove
 PKG_INSTALLED_UNUSED=$("${PACMAN}" -Q --quiet --deps --unrequired --unrequired | sort --unique)
 
 if [ -n "${PKG_INSTALLED_UNUSED}" ]; then
