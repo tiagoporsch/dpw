@@ -24,7 +24,7 @@ fi
 # Calculate changes
 function diff { comm -23 <(echo -n "$1") <(echo -n "$2"); }
 
-PKG_DECLARED=$(sed 's/#.*$//;s/ *//g; /./!d' "${PKG_FILE}" | sort --unique)
+PKG_DECLARED=$(sed 's/#.*$//;s/\s*//g; /./!d' "${PKG_FILE}" | sort --unique)
 
 PKG_INSTALLED=$("${PACMAN}" -Q --quiet | sort --unique)
 PKG_INSTALLED_EXPLICIT=$("${PACMAN}" -Q --quiet --explicit | sort --unique)
