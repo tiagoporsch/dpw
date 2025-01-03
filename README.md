@@ -11,10 +11,7 @@ kitty
 nautilus-open-any-terminal # kitty
 ```
 
-Uses `paru` by default, but it can be easily changed by modifying the `PACMAN` variable.
-
-## Installation
-Move the script to a place in your `PATH`.
+Searches for any available `pacman` wrapper by default, but it can be easily changed by modifying the `PACMAN` environment variable.
 
 ## Usage
-There are no arguments. Upon execution it removes non-declared packages, install newly declared packages and does a system upgrade.
+See `dpw help`

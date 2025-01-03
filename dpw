@@ -1,12 +1,30 @@
 #!/bin/bash
 set -e
 
-PACMAN=paru
 PKG_FILE="${HOME}/.config/dpw/packages.ini"
 
-# Edit packages.ini
-if [ "${1}" = "edit" ]; then
-  ${EDITOR} "${PKG_FILE}"
+# Check if PACMAN is not set and find an available helper
+AUR_HELPERS=("pacaur" "pikaur" "yay" "aura" "paru" "aurman")
+if [ -z "${PACMAN}" ]; then
+    for HELPER in "${AUR_HELPERS[@]}"; do
+        if command -v "$HELPER" > /dev/null 2>&1; then
+            PACMAN="$HELPER"
+            break
+        fi
+    done
+
+    if [ -z "${PACMAN}" ]; then
+        printf "\033[1m::\033[0m No available AUR helper found."
+        exit 1
+    fi
+fi
+
+# Show help menu
+if [ "${1}" = "help" ]; then
+  printf "\033[1m:: \033[1;31mdpw\033[0m - Executes the program normally, using the existing packages.ini or creating a new one if it doesn't exist yet.\n"
+  printf "\033[1m:: \033[1;31mdpw edit\033[0m - Opens the packages.ini file in the user's selected editor (defined via the EDITOR variable).\n"
+  printf "\033[1m:: \033[1;31mdpw update\033[0m - Overwrites the current contents of the package.ini file with the currently installed package. Useful after using pacman or paru directly to install new packages.\n"
+  printf "\033[1m:: \033[1;31mdpw help\033[0m - Shows this menu.\n"
   exit
 fi
 
@@ -26,6 +44,28 @@ if [ ! -e "${PKG_FILE}" ]; then
     esac
   done
 fi
+
+# Edit packages.ini
+if [ "${1}" = "edit" ]; then
+  ${EDITOR} "${PKG_FILE}"
+  exit
+fi
+
+# Update packages.ini
+if [ "${1}" = "update" ]; then
+  while true; do
+    printf "\033[1m::\033[0m Do you wish to update the currently existing packages.ini [y/N]? "
+    read -r YN
+    case ${YN:-N} in
+      [Yy]*)
+        "${PACMAN}" --query --explicit --quiet > "${PKG_FILE}"
+        break;;
+      [Nn]*)
+        exit;;
+    esac
+  done
+fi
+
 
 # Calculate changes
 function diff { comm -23 <(echo -n "$1") <(echo -n "$2"); }
