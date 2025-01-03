@@ -3,10 +3,20 @@ pkgver=1.1.0
 pkgrel=1
 pkgdesc='Declarative Pacman Wrapper'
 arch=(any)
-optdepends=('paru: recommended pacman helper')
+optdepends=(
+	'paru: recommended pacman wrapper'
+	'aura: pacman wrapper'
+	'aurman: pacman wrapper'
+	'pacaur: pacman wrapper'
+	'pikaur: pacman wrapper'
+	'yay: pacman wrapper'
+)
 license=(GPL-3.0-or-later)
 source=(dpw dpw.fish)
-sha256sums=('3195adf1f9af8bd55546191008aa1b4af9049feb4e28ec9837673be89b115504' 'c2b828519653d3f2280d4904d7ad8924d2671986c9ad33af17ff60fba83522a1')
+sha256sums=(
+	'4ad6164db071db5284677a40b896a50a7c7799ca4c5188366ffe210ed3423024'
+	'c2b828519653d3f2280d4904d7ad8924d2671986c9ad33af17ff60fba83522a1'
+)
 
 package() {
 	mkdir -p "${pkgdir}/usr/bin"

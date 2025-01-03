@@ -1,8 +1,23 @@
 #!/bin/bash
 set -e
 
-PACMAN=paru
 PKG_FILE="${HOME}/.config/dpw/packages.ini"
+
+# Check if PACMAN is not set and find an available helper
+AUR_HELPERS=("pacaur" "pikaur" "yay" "aura" "paru" "aurman")
+if [ -z "${PACMAN}" ]; then
+    for HELPER in "${AUR_HELPERS[@]}"; do
+        if command -v "$HELPER" > /dev/null 2>&1; then
+            PACMAN="$HELPER"
+            break
+        fi
+    done
+
+    if [ -z "${PACMAN}" ]; then
+        printf "\033[1m::\033[0m No available AUR helper found."
+        exit 1
+    fi
+fi
 
 # Show help menu
 if [ "${1}" = "help" ]; then
