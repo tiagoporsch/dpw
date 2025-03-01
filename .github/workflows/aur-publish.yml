@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: git fetch --prune --unshallow --tags
 
       - name: Generate PKGBUILD
         run: bash .github/workflows/generate-pkgbuild.bash
